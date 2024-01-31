@@ -1,5 +1,7 @@
 import mysql.connector
-from telegram.ext import Updater, MessageHandler, Filters
+from telegram import Update, ForceReply
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext, Filters
+
 
 # Konfigurasi database
 db_config = {
