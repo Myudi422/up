@@ -3,10 +3,10 @@ from telegram.ext import Updater, MessageHandler, Filters
 
 # Konfigurasi database
 db_config = {
-    'host': 'localhost',
-    'user': 'your_username',
-    'password': 'your_password',
-    'database': 'your_database'
+    'host': '188.166.231.207',
+    'user': 'diskon',
+    'password': 'aaaaaaac',
+    'database': 'diskon'
 }
 
 # Inisialisasi koneksi database
@@ -35,14 +35,14 @@ def save_to_database(update, context):
 # Fungsi utama
 def main():
     # Token bot Telegram, ganti dengan token bot Anda
-    telegram_token = 'YOUR_TELEGRAM_BOT_TOKEN'
+    telegram_token = '5916688383:AAEQmWAhErzCidtIrIIk41VxFgbW0_FnetY'
 
     # Inisialisasi updater
     updater = Updater(token=telegram_token, use_context=True)
     dp = updater.dispatcher
 
     # Menambahkan handler untuk pesan dari channel dengan gambar dan caption
-    dp.add_handler(MessageHandler(Filters.chat(chat_id='@your_channel_username') & Filters.photo & Filters.caption, save_to_database))
+    dp.add_handler(MessageHandler(Filters.chat(chat_id='@racuntest') & Filters.photo & Filters.caption, save_to_database))
 
     # Memulai polling
     updater.start_polling()
