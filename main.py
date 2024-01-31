@@ -23,7 +23,7 @@ api_id = '7120601'
 api_hash = 'aebd45c2c14b36c2c91dec3cf5e8ee9a'
 bot_token = '5916688383:AAEQmWAhErzCidtIrIIk41VxFgbW0_FnetY'
 
-channel_username = 'your_channel_username'  # Ganti dengan username channel Anda
+channel_username = 'racuntest'  # Ganti dengan username channel Anda
 
 app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
