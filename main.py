@@ -1,58 +1,54 @@
-import mysql.connector
-from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext, Filters
-
+from pyrogram import Client, filters
+from sqlalchemy import create_engine, Column, Integer, String, Text, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 # Konfigurasi database
-db_config = {
-    'host': '188.166.231.207',
-    'user': 'diskon',
-    'password': 'aaaaaaac',
-    'database': 'diskon'
-}
+engine = create_engine('mysql+mysqlconnector://diskon:aaaaaaac@188.166.231.207:3306/diskon', echo=True)
+Base = declarative_base()
 
-# Inisialisasi koneksi database
-conn = mysql.connector.connect(**db_config)
-cursor = conn.cursor()
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True)
+    image_link = Column(String)
+    caption = Column(Text)
+
+# Inisialisasi database
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+db_session = Session()
+
+# Inisialisasi bot Pyrogram
+api_id = '7120601'
+api_hash = 'aebd45c2c14b36c2c91dec3cf5e8ee9a'
+bot_token = '5916688383:AAEQmWAhErzCidtIrIIk41VxFgbW0_FnetY'
+
+channel_username = 'your_channel_username'  # Ganti dengan username channel Anda
+
+app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
 # Fungsi untuk menyimpan postingan ke database
-def save_to_database(update, context):
-    message = update.message
+def save_to_database(message):
     image_link = None
     caption = None
 
     # Mendapatkan link gambar (jika ada)
     if message.photo:
-        image_link = message.photo[-1].file_id
+        image_link = message.photo.file_id
 
     # Mendapatkan caption teks
     if message.caption:
         caption = message.caption
 
     # Menyimpan ke database
-    insert_query = "INSERT INTO posts (image_link, caption) VALUES (%s, %s)"
-    cursor.execute(insert_query, (image_link, caption))
-    conn.commit()
+    post = Post(image_link=image_link, caption=caption)
+    db_session.add(post)
+    db_session.commit()
 
-# Fungsi utama
-def main():
-    # Token bot Telegram, ganti dengan token bot Anda
-    telegram_token = '5916688383:AAEQmWAhErzCidtIrIIk41VxFgbW0_FnetY'
+# Handler untuk pesan dengan gambar dan caption dari channel tertentu
+@app.on_message(filters.chat(channel_username) & filters.photo & filters.caption)
+def handle_message(client, message):
+    save_to_database(message)
 
-    # Inisialisasi updater
-    updater = Updater(token=telegram_token, use_context=True)
-    dp = updater.dispatcher
-
-    # Menambahkan handler untuk pesan dari channel dengan gambar dan caption
-    dp.add_handler(MessageHandler(Filters.chat(chat_id='@racuntest') & Filters.photo & Filters.caption, save_to_database))
-
-    # Memulai polling
-    updater.start_polling()
-    updater.idle()
-
-    # Tutup koneksi database setelah bot dimatikan
-    cursor.close()
-    conn.close()
-
-if __name__ == '__main__':
-    main()
+# Jalankan bot
+app.run()
